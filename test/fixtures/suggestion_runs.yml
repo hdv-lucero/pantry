@@ -1,0 +1,28 @@
+# Four active runs and one archived one. The three completed active runs use
+# different numbers of pantry items on purpose, so zeroing a single item lands
+# each of them on a different side of the archiving threshold (§5) — see
+# `suggestion_run_test.rb` and the trigger tests in `pantry_item_test.rb`.
+
+beef_night:
+  status: completed
+  inventory_snapshot: >
+    [{"name":"ground beef","quantity":"1.0","unit":"lb","expires_on":"2026-10-23"},
+     {"name":"rice","quantity":"2.0","unit":"kg","expires_on":null},
+     {"name":"egg","quantity":"8.0","unit":"pcs","expires_on":"2026-08-04"},
+     {"name":"olive oil","quantity":"750.0","unit":"ml","expires_on":null}]
+  prompt_notes: something quick
+
+# Two used items: losing either one takes coverage to 1/2 and archives the run.
+breakfast:
+  status: completed
+
+# Three used items: losing one leaves 2/3, exactly the threshold, so it stays.
+dessert:
+  status: completed
+
+pending:
+  status: queued
+
+history:
+  status: completed
+  archived_at: <%= 3.days.ago.to_fs(:db) %>

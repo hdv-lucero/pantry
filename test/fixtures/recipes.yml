@@ -1,0 +1,32 @@
+# URLs here are written the way `Recipe.normalize_url` returns them — no query, no
+# fragment, no trailing slash — because fixtures skip callbacks, so anything else
+# would be a row the app can't produce. `recipes(:gyudon)` is deliberately shared
+# by two runs: one recipe, one identity, one verdict (§3). Exactly one recipe
+# carries each verdict, so the favorites and blocked scopes have one answer each.
+
+gyudon:
+  source_url: https://www.justonecookbook.com/gyudon
+  source_name: Just One Cookbook
+  canonical_title: Gyudon (Japanese Beef Bowl)
+
+shakshuka:
+  source_url: https://www.seriouseats.com/shakshuka-recipe
+  source_name: Serious Eats
+  canonical_title: Shakshuka
+  make_again: true
+
+overnight_oats:
+  source_url: https://www.budgetbytes.com/overnight-oats
+  source_name: Budget Bytes
+  canonical_title: Overnight Oats
+
+rice_pudding:
+  source_url: https://www.kingarthurbaking.com/recipes/rice-pudding
+  source_name: King Arthur Baking
+  canonical_title: Stovetop Rice Pudding
+
+tuna_casserole:
+  source_url: https://www.allrecipes.com/tuna-noodle-casserole
+  source_name: Allrecipes
+  canonical_title: Tuna Noodle Casserole
+  make_again: false

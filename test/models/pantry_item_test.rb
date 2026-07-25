@@ -111,6 +111,70 @@ class PantryItemTest < ActiveSupport::TestCase
     assert_equal %w[gallon kg], PantryItem.units_in_use
   end
 
+  test "in_stock excludes anything at zero" do
+    assert_includes PantryItem.in_stock, pantry_items(:milk)
+
+    pantry_items(:milk).update!(quantity: 0)
+
+    assert_not_includes PantryItem.in_stock, pantry_items(:milk)
+    assert_not_predicate pantry_items(:milk), :in_stock?
+  end
+
+  test "in_stock_names lists each in-stock name once" do
+    PantryItem.create!(name: "Rice", location: :fridge)
+    pantry_items(:olive_oil).update!(quantity: 0)
+
+    names = PantryItem.in_stock_names
+
+    assert_equal 1, names.count("rice")
+    assert_not_includes names, "olive oil"
+  end
+
+  # §5 — inventory changes are what archive a run. The three active fixture runs
+  # use two, three and four pantry items respectively, so zeroing one item puts
+  # each of them on a different side of the "more than a third out of stock" line.
+  test "zeroing a quantity archives the runs it takes below the threshold" do
+    pantry_items(:milk).update!(quantity: 0)
+
+    assert_predicate suggestion_runs(:breakfast).reload, :archived?    # 1 of 2 left
+    assert_not_predicate suggestion_runs(:dessert).reload, :archived?  # 2 of 3 left
+    assert_not_predicate suggestion_runs(:beef_night).reload, :archived?
+  end
+
+  test "deleting an item archives the runs it takes below the threshold" do
+    pantry_items(:milk).destroy!
+
+    assert_predicate suggestion_runs(:breakfast).reload, :archived?
+    assert_not_predicate suggestion_runs(:dessert).reload, :archived?
+  end
+
+  test "deleting an item another row still stocks changes nothing" do
+    PantryItem.create!(name: "milk", location: :freezer, quantity: 2)
+
+    pantry_items(:milk).destroy!
+
+    assert_not_predicate suggestion_runs(:breakfast).reload, :archived?
+  end
+
+  test "adding stock or raising a quantity never archives" do
+    pantry_items(:milk).update!(quantity: 0)
+    suggestion_runs(:breakfast).update!(archived_at: nil)
+
+    pantry_items(:milk).update!(quantity: 3)
+    PantryItem.create!(name: "bok choi", location: :fridge)
+
+    assert_not_predicate suggestion_runs(:breakfast).reload, :archived?
+  end
+
+  test "an update that leaves the quantity alone does not run the check" do
+    pantry_items(:milk).update!(quantity: 0)
+    suggestion_runs(:breakfast).update!(archived_at: nil)
+
+    pantry_items(:milk).update!(unit: "litre")
+
+    assert_not_predicate suggestion_runs(:breakfast).reload, :archived?
+  end
+
   # §4.1 morphing — every write signals a page refresh on the one inventory
   # stream, which is what keeps a second tab in sync.
   test "creating, updating and destroying each broadcast a refresh to the inventory stream" do

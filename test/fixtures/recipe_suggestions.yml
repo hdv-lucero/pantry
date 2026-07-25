@@ -1,0 +1,62 @@
+# `uses_items` values are spelled exactly as the pantry_items fixtures store them
+# (downcased, singular) — that's the exact-name echo rule the coverage math relies
+# on (§5). The JSON columns are written as JSON strings, since fixtures bypass the
+# serializer the same way they bypass callbacks.
+
+beef_night_gyudon:
+  suggestion_run: beef_night
+  recipe: gyudon
+  title: Gyudon (Japanese Beef Bowl)
+  summary: Thin beef simmered with onion in a sweet-savoury broth, served over rice.
+  uses_items: '["ground beef","rice"]'
+  missing_items: '["dashi powder","mirin","sesame oil"]'
+  substitutions: '[{"missing":"sesame oil","use_instead":"olive oil"}]'
+  position: 1
+
+beef_night_shakshuka:
+  suggestion_run: beef_night
+  recipe: shakshuka
+  title: Shakshuka
+  summary: Eggs poached in a spiced tomato and pepper sauce, cooked in one pan.
+  uses_items: '["egg","olive oil"]'
+  missing_items: '["bell pepper","paprika"]'
+  position: 2
+
+breakfast_oats:
+  suggestion_run: breakfast
+  recipe: overnight_oats
+  title: Overnight Oats
+  summary: Oats soaked overnight in milk and yogurt, ready to eat cold.
+  uses_items: '["milk","greek yogurt"]'
+  missing_items: '["rolled oats"]'
+  position: 1
+
+dessert_rice_pudding:
+  suggestion_run: dessert
+  recipe: rice_pudding
+  title: Stovetop Rice Pudding
+  summary: Rice simmered slowly in milk and finished with egg for body.
+  uses_items: '["milk","rice","egg"]'
+  missing_items: '["sugar","cinnamon"]'
+  position: 1
+
+# The archived run — same recipe as beef_night, a different presentation of it,
+# and one item ("bok choi") that left the pantry long ago.
+history_gyudon:
+  suggestion_run: history
+  recipe: gyudon
+  title: Beef Bowl (Gyudon)
+  summary: A weeknight beef-and-rice bowl that comes together in under half an hour.
+  uses_items: '["ground beef","bok choi"]'
+  missing_items: '["dashi powder"]'
+  position: 1
+  cooked_at: <%= 4.days.ago.to_fs(:db) %>
+
+history_tuna_casserole:
+  suggestion_run: history
+  recipe: tuna_casserole
+  title: Tuna Noodle Casserole
+  summary: Pasta baked with tuna in a cream sauce under a crumb topping.
+  uses_items: '["bok choi"]'
+  missing_items: '["canned tuna","egg noodle"]'
+  position: 2
