@@ -1,0 +1,48 @@
+# Names here are stored as the model normalizes them (downcased, singular) —
+# fixtures skip callbacks, so anything else would be a row the app can't produce.
+
+milk:
+  name: milk
+  quantity: 1
+  unit: gallon
+  location: fridge
+  category: dairy
+  expires_on: <%= 2.days.from_now.to_date.to_fs(:db) %>
+
+yogurt:
+  name: greek yogurt
+  quantity: 4
+  unit: cups
+  location: fridge
+  category: dairy
+  expires_on: <%= 2.days.ago.to_date.to_fs(:db) %>
+
+egg:
+  name: egg
+  quantity: 8
+  unit: pcs
+  location: fridge
+  category: protein
+  expires_on: <%= 10.days.from_now.to_date.to_fs(:db) %>
+
+ground_beef:
+  name: ground beef
+  quantity: 1
+  unit: lb
+  location: freezer
+  category: protein
+  expires_on: <%= 90.days.from_now.to_date.to_fs(:db) %>
+
+rice:
+  name: rice
+  quantity: 2
+  unit: kg
+  location: pantry
+  category: grains
+
+olive_oil:
+  name: olive oil
+  quantity: 750
+  unit: ml
+  location: pantry
+  category: condiments

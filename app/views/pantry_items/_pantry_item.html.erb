@@ -1,0 +1,38 @@
+<%# §4.1 — each row is its own frame, so Edit swaps in the form here and saving
+    swaps the row back, without the rest of the group moving. %>
+<%= turbo_frame_tag pantry_item, class: "flex items-center gap-3 py-2" do %>
+  <%# The stepper's form is what actually PATCHes; Stimulus only nudges the number
+      and waits for the clicking to stop. %>
+  <%= form_with model: pantry_item, class: "flex shrink-0 items-center gap-1",
+        data: { controller: "quantity" } do |form| %>
+    <button type="button" aria-label="Decrease <%= pantry_item.name %>" data-action="quantity#decrement"
+            class="size-6 rounded border border-gray-300 text-gray-600 leading-none hover:bg-gray-100 cursor-pointer">&minus;</button>
+
+    <%= form.number_field :quantity, value: formatted_quantity(pantry_item), step: :any, min: 0,
+          "aria-label": "Quantity of #{pantry_item.name}",
+          data: { quantity_target: "input", action: "change->quantity#save" },
+          class: "w-14 rounded border border-gray-300 px-1 py-0.5 text-center text-sm" %>
+
+    <button type="button" aria-label="Increase <%= pantry_item.name %>" data-action="quantity#increment"
+            class="size-6 rounded border border-gray-300 text-gray-600 leading-none hover:bg-gray-100 cursor-pointer">+</button>
+  <% end %>
+
+  <div class="min-w-0 flex-1">
+    <%= link_to edit_pantry_item_path(pantry_item), class: "text-sm font-medium text-gray-900 hover:underline" do %>
+      <%= pantry_item.name %><%= " #{pantry_item.unit}" if pantry_item.unit %>
+    <% end %>
+
+    <%# §4.1 — only the three-day window earns a badge. Everything else keeps its
+        date in the edit form, where it belongs, instead of shouting from the list. %>
+    <% if pantry_item.expiring_soon? %>
+      <span class="ml-1 inline-block whitespace-nowrap rounded-full bg-amber-100 px-1.5 py-0.5 text-xs text-amber-800">
+        <%= expiry_label(pantry_item) %>
+      </span>
+    <% end %>
+  </div>
+
+  <%= button_to "Remove", pantry_item_path(pantry_item), method: :delete,
+        form_class: "shrink-0",
+        aria: { label: "Remove #{pantry_item.name}" },
+        class: "rounded px-2 py-1 text-xs text-gray-400 hover:bg-red-50 hover:text-red-600 cursor-pointer" %>
+<% end %>

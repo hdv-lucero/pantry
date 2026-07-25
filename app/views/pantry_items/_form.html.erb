@@ -1,0 +1,31 @@
+<%= form_with model: pantry_item, namespace: dom_id(pantry_item),
+      class: "w-full rounded-lg bg-gray-50 p-3" do |form| %>
+  <% if pantry_item.errors.any? %>
+    <p class="mb-2 rounded-md bg-red-50 px-2 py-1 text-sm text-red-600">
+      <%= pantry_item.errors.full_messages.to_sentence %>
+    </p>
+  <% end %>
+
+  <div class="grid grid-cols-2 gap-2 text-sm">
+    <%= form.text_field :name, "aria-label": "Name", autofocus: true,
+          class: "col-span-2 rounded-md border border-gray-300 px-2 py-1 shadow-sm" %>
+    <%= form.number_field :quantity, value: formatted_quantity(pantry_item), step: :any, min: 0, "aria-label": "Quantity",
+          class: "rounded-md border border-gray-300 px-2 py-1 shadow-sm" %>
+    <%= form.text_field :unit, list: "unit_suggestions", placeholder: "unit", "aria-label": "Unit",
+          class: "rounded-md border border-gray-300 px-2 py-1 shadow-sm" %>
+    <%= form.select :location, PantryItem.locations.keys.map { |name| [ name.capitalize, name ] }, {},
+          "aria-label": "Location", class: "rounded-md border border-gray-300 px-2 py-1 shadow-sm" %>
+    <%= form.select :category, PantryItem.categories.keys.map { |name| [ name.capitalize, name ] },
+          { include_blank: "Category" },
+          "aria-label": "Category", class: "rounded-md border border-gray-300 px-2 py-1 shadow-sm" %>
+    <%= form.date_field :expires_on, "aria-label": "Expires on",
+          class: "col-span-2 rounded-md border border-gray-300 px-2 py-1 shadow-sm" %>
+  </div>
+
+  <div class="mt-2 flex items-center gap-2">
+    <%= form.submit "Save", class: "rounded-md bg-blue-600 px-3 py-1 text-sm font-medium text-white hover:bg-blue-500 cursor-pointer" %>
+    <%# Loads the index and lets Turbo pull this row's frame out of it — the frame
+        is the unit of navigation, so cancelling needs no extra route. %>
+    <%= link_to "Cancel", pantry_items_path, class: "text-sm text-gray-500 hover:underline" %>
+  </div>
+<% end %>

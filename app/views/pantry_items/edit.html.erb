@@ -1,0 +1,4 @@
+<%# Matches the row's frame id, so Turbo swaps this form in where the row was. %>
+<%= turbo_frame_tag @pantry_item do %>
+  <%= render "form", pantry_item: @pantry_item %>
+<% end %>

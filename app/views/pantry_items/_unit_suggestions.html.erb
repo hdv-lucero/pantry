@@ -1,0 +1,8 @@
+<%# §4.1 — units stay free text; this is just the list of ones already in use, shared
+    by every quick-add and edit form on the page. Re-rendered on create so a brand
+    new unit is suggestable immediately. %>
+<datalist id="unit_suggestions">
+  <% units_in_use.each do |unit| %>
+    <option value="<%= unit %>"></option>
+  <% end %>
+</datalist>

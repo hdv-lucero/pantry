@@ -1,0 +1,11 @@
+<%# §4.1 — "appends the new item to its group via a Turbo Stream response, resets
+    the form". No broadcast: this is the acting tab, and its own refresh broadcast
+    is filtered out by request id. %>
+<%= turbo_stream.append location_items_id(@pantry_item.location), partial: "pantry_items/pantry_item",
+      locals: { pantry_item: @pantry_item } %>
+
+<%= turbo_stream.replace quick_add_id(@pantry_item.location), partial: "pantry_items/quick_add",
+      locals: { pantry_item: PantryItem.new(location: @pantry_item.location) } %>
+
+<%= turbo_stream.replace "use_soon", partial: "pantry_items/use_soon" %>
+<%= turbo_stream.replace "unit_suggestions", partial: "pantry_items/unit_suggestions" %>

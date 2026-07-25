@@ -1,0 +1,20 @@
+<%# §4.1 — computed server-side, no JavaScript at all. Always rendered, empty or
+    not, so Turbo Streams always have a target to replace. %>
+<section id="use_soon" class="mb-8 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
+  <h2 class="text-sm font-semibold uppercase tracking-wide text-amber-800">Use soon</h2>
+
+  <% if expiring_soon.any? %>
+    <ul class="mt-2 flex flex-wrap gap-2">
+      <% expiring_soon.each do |pantry_item| %>
+        <li class="rounded-full bg-white px-3 py-1 text-sm text-amber-900 ring-1 ring-amber-200">
+          <span class="font-medium"><%= pantry_item.name %></span>
+          <span class="text-amber-700">· <%= expiry_label(pantry_item) %></span>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <p class="mt-1 text-sm text-amber-700">
+      Nothing expires in the next <%= pluralize(PantryItem::EXPIRING_SOON_WINDOW.in_days.to_i, "day") %>.
+    </p>
+  <% end %>
+</section>

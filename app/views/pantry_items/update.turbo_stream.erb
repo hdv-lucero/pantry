@@ -1,0 +1,12 @@
+<% if @pantry_item.saved_change_to_location? %>
+  <%# The row has to leave one group frame and join another. %>
+  <%= turbo_stream.remove @pantry_item %>
+  <%= turbo_stream.append location_items_id(@pantry_item.location), partial: "pantry_items/pantry_item",
+        locals: { pantry_item: @pantry_item } %>
+<% else %>
+  <%= turbo_stream.replace @pantry_item, partial: "pantry_items/pantry_item",
+        locals: { pantry_item: @pantry_item } %>
+<% end %>
+
+<%= turbo_stream.replace "use_soon", partial: "pantry_items/use_soon" %>
+<%= turbo_stream.replace "unit_suggestions", partial: "pantry_items/unit_suggestions" %>

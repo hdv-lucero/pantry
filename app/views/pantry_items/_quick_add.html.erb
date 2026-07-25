@@ -1,0 +1,41 @@
+<%# §4.1 — one text input taking "name x quantity unit", parsed server-side, with
+    explicit fallback fields underneath for when the notation is more trouble than
+    it's worth. `quick_add` is deliberately not a PantryItem attribute: it is input
+    to a parser, not a column, so it is named by hand rather than through the builder. %>
+<div id="<%= quick_add_id(pantry_item.location) %>">
+  <%= form_with model: pantry_item, url: pantry_items_path, namespace: pantry_item.location do |form| %>
+    <%= form.hidden_field :location %>
+
+    <% if pantry_item.errors.any? %>
+      <p class="mb-2 rounded-md bg-red-50 px-2 py-1 text-sm text-red-600">
+        <%= pantry_item.errors.full_messages.to_sentence %>
+      </p>
+    <% end %>
+
+    <div class="flex gap-2">
+      <%= label_tag quick_add_field_id(pantry_item.location), "Add to #{pantry_item.location}", class: "sr-only" %>
+      <%= text_field_tag "pantry_item[quick_add]", nil,
+            id: quick_add_field_id(pantry_item.location),
+            placeholder: "Bok Choi x3 stalks",
+            autocomplete: "off",
+            class: "min-w-0 flex-1 rounded-md border border-gray-300 px-2 py-1.5 text-sm shadow-sm focus:outline-blue-600" %>
+      <%= form.submit "Add", class: "shrink-0 rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-500 cursor-pointer" %>
+    </div>
+
+    <details class="mt-2 text-sm">
+      <summary class="cursor-pointer text-gray-500 hover:text-gray-700">Details</summary>
+
+      <div class="mt-2 grid grid-cols-2 gap-2">
+        <%= form.number_field :quantity, value: nil, step: :any, min: 0, placeholder: "1",
+              "aria-label": "Quantity", class: "rounded-md border border-gray-300 px-2 py-1 shadow-sm" %>
+        <%= form.text_field :unit, value: nil, list: "unit_suggestions", placeholder: "unit",
+              "aria-label": "Unit", class: "rounded-md border border-gray-300 px-2 py-1 shadow-sm" %>
+        <%= form.select :category, PantryItem.categories.keys.map { |name| [ name.capitalize, name ] },
+              { include_blank: "Category" },
+              "aria-label": "Category", class: "rounded-md border border-gray-300 px-2 py-1 shadow-sm" %>
+        <%= form.date_field :expires_on, "aria-label": "Expires on",
+              class: "rounded-md border border-gray-300 px-2 py-1 shadow-sm" %>
+      </div>
+    </details>
+  <% end %>
+</div>

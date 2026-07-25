@@ -1,0 +1,30 @@
+<div class="w-full">
+  <%# §4.1 — Turbo 8 morphing: this subscription is what lets a second tab (and, from
+      Task 6, a confirmed cook) repaint without a bespoke stream per interaction. %>
+  <%= turbo_stream_from PantryItem::INVENTORY_STREAM %>
+
+  <header class="flex flex-wrap items-baseline justify-between gap-4 mb-8">
+    <div>
+      <h1 class="font-bold text-4xl">Pantry</h1>
+      <p class="mt-1 text-sm text-gray-500">
+        Signed in as <span class="font-medium text-gray-700"><%= Current.user.email_address %></span>
+      </p>
+    </div>
+
+    <%= button_to "Sign out", session_path, method: :delete, class: "rounded-md px-3 py-1.5 text-sm bg-gray-800 hover:bg-gray-700 text-white font-medium cursor-pointer" %>
+  </header>
+
+  <% if notice = flash[:notice] %>
+    <p class="py-2 px-3 bg-green-50 mb-5 text-green-600 font-medium rounded-lg inline-block" id="notice"><%= notice %></p>
+  <% end %>
+
+  <%= render "use_soon" %>
+
+  <div class="grid gap-6 md:grid-cols-3">
+    <% @grouped_items.each do |location, items| %>
+      <%= render "location_group", location: location, items: items %>
+    <% end %>
+  </div>
+
+  <%= render "unit_suggestions" %>
+</div>
