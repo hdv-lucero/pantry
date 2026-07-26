@@ -50,4 +50,10 @@ Rails.application.configure do
 
   # Raise error when a before_action's only/except options reference missing actions.
   config.action_controller.raise_on_missing_callback_actions = true
+
+  # Jobs are asserted on, not executed, unless a test opts in with
+  # `perform_enqueued_jobs`. Set explicitly because development now names an
+  # adapter (:solid_queue) and inheriting that here would want queue tables the
+  # test database deliberately does not have.
+  config.active_job.queue_adapter = :test
 end

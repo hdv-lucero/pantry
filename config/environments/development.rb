@@ -25,8 +25,11 @@ Rails.application.configure do
     config.action_controller.perform_caching = false
   end
 
-  # Change to :null_store to avoid any caching.
-  config.cache_store = :memory_store
+  # Solid Cache rather than the generated :memory_store. §5 caches suggestion
+  # results by inventory fingerprint with a 1-hour TTL, and the writer (the job,
+  # in the Solid Queue process) is not the reader (the controller, in Puma) — a
+  # per-process memory store would miss every time. Backed by its own SQLite file.
+  config.cache_store = :solid_cache_store
 
   # Store uploaded files on the local file system (see config/storage.yml for options).
   config.active_storage.service = :local
@@ -54,6 +57,14 @@ Rails.application.configure do
 
   # Highlight code that enqueued background job in logs.
   config.active_job.verbose_enqueue_logs = true
+
+  # Solid Queue in development, matching production. Rails generates `:async`
+  # here, which runs jobs on an in-process thread pool that dies with the server
+  # and silently drops anything still queued — fine for a mailer, wrong for the
+  # LLM call that is the point of §4.2. `SOLID_QUEUE_IN_PUMA` (docker-compose.yml)
+  # has Puma fork the supervisor, so `docker compose up` is still one command.
+  config.active_job.queue_adapter = :solid_queue
+  config.solid_queue.connects_to = { database: { writing: :queue } }
 
   # Highlight code that triggered redirect in logs.
   config.action_dispatch.verbose_redirect_logs = true

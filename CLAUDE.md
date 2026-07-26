@@ -60,9 +60,23 @@ Notes:
   `CHROME_BINARY` / `CHROMEDRIVER_PATH` are set there and read by
   `test/application_system_test_case.rb`; CI's runner has real Chrome and sets
   neither, so Selenium Manager handles it there.
-- `SOLID_QUEUE_IN_PUMA` is commented out in `docker-compose.yml`. Rails' generated
-  development config uses the `:async` queue adapter against a single
-  `development.sqlite3` with no `solid_queue` tables, so enabling it as-is crashes the
-  supervisor on boot. Task 5 is where a real development queue gets decided.
+- **Development runs the full Solid stack** (settled in Task 5). `storage/` holds four
+  development `.sqlite3` files mirroring production's four, `SOLID_QUEUE_IN_PUMA=1` has
+  Puma fork the queue supervisor, and cable/cache use `solid_cable`/`solid_cache` rather
+  than the generated `async`/`:memory_store`. The reason is that `SuggestRecipesJob` runs
+  in a different process from the request that enqueued it, and the generated defaults
+  are all same-process — broadcasts (§4.2) and the fingerprint cache (§5) would silently
+  no-op in development while working in production. `bin/rails db:prepare` creates all
+  four. **Test stays single-file** and swaps in the `:test` job/cable adapters and
+  `:null_store`.
+- The LLM call needs `anthropic.api_key` in Rails credentials (§5 — never env-committed).
+  Without it `SuggestRecipesJob` fails the run cleanly with "Recipe suggestions aren't
+  configured yet" rather than raising. CI needs `RAILS_MASTER_KEY` as a repo secret
+  before it can decrypt (still commented out in `.github/workflows/ci.yml`).
+- **No test may reach the network.** `test_helper.rb` sets
+  `WebMock.disable_net_connect!(allow_localhost: true)`; the Anthropic fixtures live in
+  `test/fixtures/files/anthropic/` and their provenance is documented in the README
+  there. `bin/rails suggestions:capture_fixture` re-records the success fixture from a
+  real, billable call.
 - There is no sign-up UI (the Rails 8 auth generator ships none by design). Accounts
   come from `db/seeds.rb`.

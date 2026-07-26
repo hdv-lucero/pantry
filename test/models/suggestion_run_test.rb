@@ -1,6 +1,9 @@
 require "test_helper"
+require "turbo/broadcastable/test_helper"
 
 class SuggestionRunTest < ActiveSupport::TestCase
+  include Turbo::Broadcastable::TestHelper
+
   # Everything the pantry_items fixtures have on hand, which is what the coverage
   # math sees unless a test says otherwise.
   IN_STOCK = [ "milk", "greek yogurt", "egg", "ground beef", "rice", "olive oil" ].freeze
@@ -135,4 +138,155 @@ class SuggestionRunTest < ActiveSupport::TestCase
       end
     end
   end
+
+  # ── §4.2's lifecycle, added in Task 5 ───────────────────────────────────────
+
+  test "start! records the snapshot and flips to running in one write" do
+    run = SuggestionRun.create!
+    snapshot = InventorySnapshot.current
+
+    run.start!(snapshot)
+
+    assert_predicate run, :running?
+    assert_equal snapshot.entries, run.reload.inventory_snapshot
+  end
+
+  test "complete! creates the cards and flips to completed" do
+    run = SuggestionRun.create!
+
+    run.complete!([ {
+      title: "A Real Recipe", source_url: "https://www.seriouseats.com/a-real-recipe",
+      source_name: "Serious Eats", summary: "Something you can make.",
+      uses_items: [ "rice" ], missing_items: [ "sugar" ], substitutions: [], position: 0
+    } ])
+
+    assert_predicate run, :completed?
+    assert_equal "A Real Recipe", run.recipe_suggestions.sole.title
+  end
+
+  test "complete! rolls back every card if one is unusable" do
+    run = SuggestionRun.create!
+    good = { title: "Fine", source_url: "https://www.seriouseats.com/fine", source_name: "Serious Eats",
+             summary: "Fine.", uses_items: [ "rice" ], missing_items: [], substitutions: [], position: 0 }
+    bad = good.merge(title: nil, source_url: "https://www.seriouseats.com/bad", position: 1)
+
+    assert_raises(ActiveRecord::RecordInvalid) { run.complete!([ good, bad ]) }
+
+    assert_equal 0, run.reload.recipe_suggestions.count
+    assert_not_predicate run, :completed?
+  end
+
+  test "fail! records a message and flips to failed" do
+    run = SuggestionRun.create!
+
+    run.fail!("Couldn't reach the recipe search. Try again?")
+
+    assert_predicate run, :failed?
+    assert_equal "Couldn't reach the recipe search. Try again?", run.error_message
+  end
+
+  test "a failed run is still active — only coverage archives a run" do
+    run = SuggestionRun.create!
+    run.fail!("nope")
+
+    assert_not_predicate run, :archived?
+    assert_includes SuggestionRun.active, run
+  end
+
+  test "an over-long error message is truncated rather than rejected" do
+    run = SuggestionRun.create!
+
+    run.fail!("x" * 900)
+
+    assert_equal 500, run.error_message.length
+  end
+
+  # ── §4.2's broadcasts ───────────────────────────────────────────────────────
+
+  test "each status change broadcasts once" do
+    run = SuggestionRun.create!
+
+    assert_turbo_stream_broadcasts SuggestionRun::BROADCAST_STREAM, count: 1 do
+      run.start!(InventorySnapshot.current)
+    end
+
+    assert_turbo_stream_broadcasts SuggestionRun::BROADCAST_STREAM, count: 1 do
+      run.fail!("nope")
+    end
+  end
+
+  test "a write that does not change status does not broadcast" do
+    run = SuggestionRun.create!
+    run.start!(InventorySnapshot.current)
+
+    assert_turbo_stream_broadcasts SuggestionRun::BROADCAST_STREAM, count: 0 do
+      run.update!(prompt_notes: "something quick")
+      run.archive!
+    end
+  end
+
+  # ── §5's per-day limit ──────────────────────────────────────────────────────
+
+  test "today counts only runs created today" do
+    SuggestionRun.create!
+    travel_to 2.days.ago do
+      SuggestionRun.create!
+    end
+
+    assert_equal SuggestionRun.where(created_at: Time.current.all_day).count, SuggestionRun.today.count
+    assert_not_includes SuggestionRun.today.pluck(:created_at).map(&:to_date), 2.days.ago.to_date
+  end
+
+  test "daily_limit_reached? flips at the limit" do
+    clear_runs
+    (SuggestionRun::DAILY_LIMIT - 1).times { SuggestionRun.create! }
+
+    assert_not SuggestionRun.daily_limit_reached?
+
+    SuggestionRun.create!
+
+    assert SuggestionRun.daily_limit_reached?
+  end
+
+  test "within_daily_limit? counts only the runs before this one" do
+    clear_runs
+    runs = (SuggestionRun::DAILY_LIMIT + 1).times.map { SuggestionRun.create! }
+
+    # The last one allowed is the DAILY_LIMIT-th; the one after it is not.
+    assert_predicate runs[SuggestionRun::DAILY_LIMIT - 1], :within_daily_limit?
+    assert_not_predicate runs[SuggestionRun::DAILY_LIMIT], :within_daily_limit?
+  end
+
+  test "yesterday's runs do not count against today" do
+    clear_runs
+    travel_to 1.day.ago do
+      SuggestionRun::DAILY_LIMIT.times { SuggestionRun.create! }
+    end
+
+    assert_not SuggestionRun.daily_limit_reached?
+    assert_predicate SuggestionRun.create!, :within_daily_limit?
+  end
+
+  # ── §4.3's favorites badge ──────────────────────────────────────────────────
+
+  test "includes_favorite? sees a thumbs-up on any of the run's recipes" do
+    assert_predicate recipes(:shakshuka), :favorite?
+
+    run = SuggestionRun.create!
+    run.recipe_suggestions.create!(recipe: recipes(:overnight_oats), title: "Oats", uses_items: [])
+
+    assert_not_predicate run, :includes_favorite?
+
+    run.recipe_suggestions.create!(recipe: recipes(:shakshuka), title: "Shakshuka", uses_items: [])
+
+    assert_predicate run.reload, :includes_favorite?
+  end
+
+  private
+    # `delete_all` would leave the recipe_suggestions fixtures pointing at rows that
+    # no longer exist, and SQLite enforces the foreign key.
+    def clear_runs
+      RecipeSuggestion.delete_all
+      SuggestionRun.delete_all
+    end
 end

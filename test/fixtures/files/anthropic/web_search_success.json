@@ -1,0 +1,114 @@
+{
+  "id": "msg_01WkZ4rD8vQxJmN3pLtYbHfR",
+  "type": "message",
+  "role": "assistant",
+  "model": "claude-sonnet-5",
+  "content": [
+    {
+      "type": "thinking",
+      "thinking": "",
+      "signature": "EqgBCkYIBRgCKkC8n…truncated-for-the-fixture…"
+    },
+    {
+      "type": "server_tool_use",
+      "id": "srvtoolu_013704a51d4b2dfce6d7c5",
+      "caller": {
+        "type": "direct"
+      },
+      "name": "web_search",
+      "input": {
+        "query": "recipes with ground beef rice eggs milk"
+      }
+    },
+    {
+      "type": "web_search_tool_result",
+      "tool_use_id": "srvtoolu_013704a51d4b2dfce6d7c5",
+      "caller": {
+        "type": "direct"
+      },
+      "content": [
+        {
+          "type": "web_search_result",
+          "title": "Gyudon (Japanese Beef Bowl) - Just One Cookbook",
+          "url": "https://www.justonecookbook.com/gyudon",
+          "encrypted_content": "EqgfCioIBRgCIiQ4ZmY…truncated-for-the-fixture…",
+          "page_age": "March 14, 2026"
+        },
+        {
+          "type": "web_search_result",
+          "title": "Shakshuka Recipe - Serious Eats",
+          "url": "https://www.seriouseats.com/shakshuka-recipe",
+          "encrypted_content": "EqgfCioIBRgCIiQ4ZmY…truncated-for-the-fixture…",
+          "page_age": "March 14, 2026"
+        }
+      ]
+    },
+    {
+      "type": "code_execution_tool_result",
+      "tool_use_id": "srvtoolu_016485706b370f5d24e9e7",
+      "content": {
+        "type": "encrypted_code_execution_result",
+        "encrypted_stdout": "Eq4BCioIEhgCIiQxNzVhNDBk…truncated-for-the-fixture…",
+        "stderr": ""
+      }
+    },
+    {
+      "type": "server_tool_use",
+      "id": "srvtoolu_01f63474dd21c70fd45cff",
+      "caller": {
+        "type": "direct"
+      },
+      "name": "web_search",
+      "input": {
+        "query": "what to make with greek yogurt and eggs"
+      }
+    },
+    {
+      "type": "web_search_tool_result",
+      "tool_use_id": "srvtoolu_01f63474dd21c70fd45cff",
+      "caller": {
+        "type": "direct"
+      },
+      "content": [
+        {
+          "type": "web_search_result",
+          "title": "Greek Yogurt Pancakes - Love and Lemons",
+          "url": "https://www.loveandlemons.com/greek-yogurt-pancakes",
+          "encrypted_content": "EqgfCioIBRgCIiQ4ZmY…truncated-for-the-fixture…",
+          "page_age": "March 14, 2026"
+        },
+        {
+          "type": "web_search_result",
+          "title": "Stovetop Rice Pudding - King Arthur Baking",
+          "url": "https://www.kingarthurbaking.com/recipes/rice-pudding",
+          "encrypted_content": "EqgfCioIBRgCIiQ4ZmY…truncated-for-the-fixture…",
+          "page_age": "March 14, 2026"
+        }
+      ]
+    },
+    {
+      "type": "code_execution_tool_result",
+      "tool_use_id": "srvtoolu_01107b7bf810b89f867adf",
+      "content": {
+        "type": "encrypted_code_execution_result",
+        "encrypted_stdout": "Eq4BCioIEhgCIiQxNzVhNDBk…truncated-for-the-fixture…",
+        "stderr": ""
+      }
+    },
+    {
+      "type": "text",
+      "text": "{\n  \"recipes\": [\n    {\n      \"title\": \"Gyudon (Japanese Beef Bowl)\",\n      \"source_url\": \"https://www.justonecookbook.com/gyudon\",\n      \"source_name\": \"Just One Cookbook\",\n      \"summary\": \"A fast Japanese rice bowl that simmers thinly sliced beef with onion in a sweet-savoury broth. It leans on the beef and rice you already have.\",\n      \"uses_items\": [\n        \"ground beef\",\n        \"rice\"\n      ],\n      \"missing_items\": [\n        \"onion\",\n        \"dashi powder\",\n        \"mirin\",\n        \"soy sauce\"\n      ],\n      \"substitutions\": []\n    },\n    {\n      \"title\": \"Greek Yogurt Pancakes\",\n      \"source_url\": \"https://www.loveandlemons.com/greek-yogurt-pancakes\",\n      \"source_name\": \"Love and Lemons\",\n      \"summary\": \"Thick, tangy pancakes that use yogurt instead of buttermilk. A good way to spend the yogurt and eggs in one go.\",\n      \"uses_items\": [\n        \"greek yogurt\",\n        \"egg\",\n        \"milk\"\n      ],\n      \"missing_items\": [\n        \"all-purpose flour\",\n        \"baking powder\",\n        \"butter\"\n      ],\n      \"substitutions\": [\n        {\n          \"missing\": \"butter\",\n          \"use_instead\": \"olive oil\"\n        }\n      ]\n    },\n    {\n      \"title\": \"Shakshuka\",\n      \"source_url\": \"https://www.seriouseats.com/shakshuka-recipe\",\n      \"source_name\": \"Serious Eats\",\n      \"summary\": \"Eggs poached in a spiced tomato and pepper sauce, cooked and served in one pan. Built around the eggs and olive oil on hand.\",\n      \"uses_items\": [\n        \"egg\",\n        \"olive oil\"\n      ],\n      \"missing_items\": [\n        \"crushed tomatoes\",\n        \"bell pepper\",\n        \"onion\"\n      ],\n      \"substitutions\": []\n    },\n    {\n      \"title\": \"Stovetop Rice Pudding\",\n      \"source_url\": \"https://www.kingarthurbaking.com/recipes/rice-pudding\",\n      \"source_name\": \"King Arthur Baking\",\n      \"summary\": \"A slow-simmered pudding that turns leftover rice and milk into dessert. Uses the milk before it turns.\",\n      \"uses_items\": [\n        \"rice\",\n        \"milk\",\n        \"egg\"\n      ],\n      \"missing_items\": [\n        \"sugar\",\n        \"cinnamon\"\n      ],\n      \"substitutions\": []\n    },\n    {\n      \"title\": \"Beef and Rice Skillet\",\n      \"source_url\": \"https://www.budgetbytes.com/beef-and-rice-skillet\",\n      \"source_name\": \"Budget Bytes\",\n      \"summary\": \"A one-pan weeknight skillet of browned beef and rice. Nearly everything it needs is already in the pantry.\",\n      \"uses_items\": [\n        \"ground beef\",\n        \"rice\",\n        \"olive oil\"\n      ],\n      \"missing_items\": [\n        \"bell pepper\",\n        \"taco seasoning\"\n      ],\n      \"substitutions\": []\n    }\n  ]\n}"
+    }
+  ],
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "usage": {
+    "input_tokens": 1842,
+    "output_tokens": 940,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "server_tool_use": {
+      "web_search_requests": 3
+    }
+  }
+}

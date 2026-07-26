@@ -9,13 +9,39 @@ default: &default
   max_connections: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
   timeout: 5000
 
+# Development mirrors production's four separate files rather than Rails' generated
+# single-file default. Task 5 forced the question: with Solid Queue running in Puma,
+# the job is a different process from the request that enqueued it, and the generated
+# development config has no answer for that — the `async` cable adapter only reaches
+# subscribers in its own process, and a `:memory_store` cache is not shared either.
+# So §4.2's live status broadcasts and §5's fingerprint cache would both quietly do
+# nothing in development while working in production, which is the worst way for a
+# demo to be wrong. Four files here, four in production (§2, §7).
 development:
-  <<: *default
-  database: storage/development.sqlite3
+  primary:
+    <<: *default
+    database: storage/development.sqlite3
+  cache:
+    <<: *default
+    database: storage/development_cache.sqlite3
+    migrations_paths: db/cache_migrate
+  queue:
+    <<: *default
+    database: storage/development_queue.sqlite3
+    migrations_paths: db/queue_migrate
+  cable:
+    <<: *default
+    database: storage/development_cable.sqlite3
+    migrations_paths: db/cable_migrate
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
 # Do not set this db to the same as development or production.
+#
+# Test stays a single file on purpose: the queue, cable and cache backends are all
+# swapped for in-process test doubles (:test job adapter, :test cable adapter,
+# :null_store), so three more SQLite files would be created, migrated and never
+# read — once per parallel worker.
 test:
   <<: *default
   database: storage/test.sqlite3

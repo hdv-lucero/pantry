@@ -1,0 +1,41 @@
+<%# §4.2 — the run card, through its four states. Task 5 needs this to exist because
+    a status transition broadcasts a re-render of it (SuggestionRun#broadcast_card),
+    and a broadcast with no partial is a broadcast that raises.
+
+    Deliberately plain: this is the lifecycle skeleton, not the finished card. Task 6
+    owns the design — the missing-items and substitution display, the favorites ★, and
+    the "I made this" button all land here, and the completed branch below is where the
+    real card goes. What is here now is what Task 5 can honestly claim to have tested:
+    that each transition reaches the browser with the right state. %>
+<%= tag.div id: dom_id(suggestion_run), class: "rounded-lg border border-gray-200 p-4" do %>
+  <% case suggestion_run.status.to_sym %>
+  <% when :queued %>
+    <p class="text-sm text-gray-500" role="status">Queued…</p>
+
+  <% when :running %>
+    <p class="text-sm text-gray-500" role="status">Searching for recipes you can make…</p>
+
+  <% when :completed %>
+    <p class="mb-2 text-sm font-medium text-gray-900">
+      <%= pluralize(suggestion_run.recipe_suggestions.size, "recipe") %> for what you have
+    </p>
+
+    <ul class="space-y-2">
+      <% suggestion_run.recipe_suggestions.each do |suggestion| %>
+        <li class="text-sm">
+          <%= link_to suggestion.title, suggestion.recipe.source_url,
+                class: "font-medium text-gray-900 hover:underline",
+                target: "_blank", rel: "noopener noreferrer" %>
+          <% if suggestion.missing_items.any? %>
+            <span class="text-gray-500">— you'd need: <%= suggestion.missing_items.to_sentence %></span>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+
+  <% when :failed %>
+    <p class="text-sm text-red-700" role="alert">
+      <%= suggestion_run.error_message.presence || "Something went wrong." %>
+    </p>
+  <% end %>
+<% end %>

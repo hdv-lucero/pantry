@@ -12,10 +12,10 @@ services:
       RAILS_ENV: development
       # The container must bind 0.0.0.0, not localhost, to be reachable from the host.
       BINDING: 0.0.0.0
-      # Off until Task 5: Rails 8's generated development config uses the :async
-      # queue adapter against a single development.sqlite3 with no solid_queue
-      # tables, so enabling this now starts a supervisor that dies on first query.
-      # SOLID_QUEUE_IN_PUMA: 1
+      # Settled in Task 5: development now has its own queue database and names
+      # the :solid_queue adapter (config/environments/development.rb), so Puma can
+      # fork the supervisor and `docker compose up` stays a single command.
+      SOLID_QUEUE_IN_PUMA: 1
     volumes:
       - .:/rails
       - bundle_cache:/usr/local/bundle

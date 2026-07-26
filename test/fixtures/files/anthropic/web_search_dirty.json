@@ -1,0 +1,64 @@
+{
+  "id": "msg_01WkZ4rD8vQxJmN3pLtYbHfR",
+  "type": "message",
+  "role": "assistant",
+  "model": "claude-sonnet-5",
+  "content": [
+    {
+      "type": "thinking",
+      "thinking": "",
+      "signature": "EqgBCkYIBRgCKkC8n…truncated-for-the-fixture…"
+    },
+    {
+      "type": "server_tool_use",
+      "id": "srvtoolu_0133465bcbd33bf09e59f0",
+      "caller": {
+        "type": "direct"
+      },
+      "name": "web_search",
+      "input": {
+        "query": "recipes for this pantry"
+      }
+    },
+    {
+      "type": "web_search_tool_result",
+      "tool_use_id": "srvtoolu_0133465bcbd33bf09e59f0",
+      "caller": {
+        "type": "direct"
+      },
+      "content": [
+        {
+          "type": "web_search_result",
+          "title": "Beef and Rice Skillet - Budget Bytes",
+          "url": "https://www.budgetbytes.com/beef-and-rice-skillet",
+          "encrypted_content": "EqgfCioIBRgCIiQ4ZmY…truncated-for-the-fixture…",
+          "page_age": "March 14, 2026"
+        }
+      ]
+    },
+    {
+      "type": "code_execution_tool_result",
+      "tool_use_id": "srvtoolu_01acca1832e333659b9504",
+      "content": {
+        "type": "encrypted_code_execution_result",
+        "encrypted_stdout": "Eq4BCioIEhgCIiQxNzVhNDBk…truncated-for-the-fixture…",
+        "stderr": ""
+      }
+    },
+    {
+      "type": "text",
+      "text": "```json\n{\n  \"recipes\": [\n    {\n      \"title\": \"Beef and Rice Skillet\",\n      \"source_url\": \"https://www.budgetbytes.com/beef-and-rice-skillet?utm_source=pinterest\",\n      \"source_name\": \"Budget Bytes\",\n      \"summary\": \"A one-pan skillet of browned beef and rice.\",\n      \"uses_items\": [\n        \"ground beef\",\n        \"bok choi\",\n        \"rice\"\n      ],\n      \"missing_items\": [\n        \"bell pepper\"\n      ],\n      \"substitutions\": []\n    },\n    {\n      \"title\": \"Tuna Noodle Casserole\",\n      \"source_url\": \"https://www.allrecipes.com/tuna-noodle-casserole\",\n      \"source_name\": \"Allrecipes\",\n      \"summary\": \"A creamy baked casserole.\",\n      \"uses_items\": [\n        \"milk\"\n      ],\n      \"missing_items\": [\n        \"egg noodles\",\n        \"canned tuna\"\n      ],\n      \"substitutions\": []\n    },\n    {\n      \"title\": \"Beef & Rice Skillet (again)\",\n      \"source_url\": \"https://www.budgetbytes.com/beef-and-rice-skillet#recipe-card\",\n      \"source_name\": \"Budget Bytes\",\n      \"summary\": \"The same skillet, returned twice.\",\n      \"uses_items\": [\n        \"ground beef\"\n      ],\n      \"missing_items\": [],\n      \"substitutions\": []\n    },\n    {\n      \"title\": \"Grandma's Secret Rice Bowl\",\n      \"source_url\": \"https://localhost:3000/recipes/secret\",\n      \"source_name\": \"Nowhere\",\n      \"summary\": \"A recipe at an address no cook can open.\",\n      \"uses_items\": [\n        \"rice\"\n      ],\n      \"missing_items\": [],\n      \"substitutions\": []\n    },\n    {\n      \"title\": \"Bok Choi Hotpot\",\n      \"source_url\": \"https://www.seriouseats.com/bok-choi-hotpot\",\n      \"source_name\": \"Serious Eats\",\n      \"summary\": \"A hotpot built on things this pantry does not hold.\",\n      \"uses_items\": [\n        \"bok choi\",\n        \"shiitake mushroom\"\n      ],\n      \"missing_items\": [\n        \"dashi\"\n      ],\n      \"substitutions\": []\n    },\n    {\n      \"title\": \"Stovetop Rice Pudding\",\n      \"source_url\": \"https://www.kingarthurbaking.com/recipes/rice-pudding\",\n      \"source_name\": \"King Arthur Baking\",\n      \"summary\": \"A slow-simmered pudding that turns rice and milk into dessert.\",\n      \"uses_items\": [\n        \"rice\",\n        \"milk\"\n      ],\n      \"missing_items\": [\n        \"sugar\",\n        \"butter\"\n      ],\n      \"substitutions\": [\n        {\n          \"missing\": \"butter\",\n          \"use_instead\": \"olive oil\"\n        },\n        {\n          \"missing\": \"sugar\",\n          \"use_instead\": \"honey\"\n        },\n        {\n          \"missing\": \"vanilla extract\",\n          \"use_instead\": \"milk\"\n        }\n      ]\n    },\n    {\n      \"title\": \"Mystery Casserole\",\n      \"source_url\": \"https://www.seriouseats.com/mystery-casserole\",\n      \"source_name\": \"Serious Eats\",\n      \"uses_items\": [\n        \"egg\"\n      ],\n      \"missing_items\": [],\n      \"substitutions\": []\n    }\n  ]\n}\n```"
+    }
+  ],
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "usage": {
+    "input_tokens": 1842,
+    "output_tokens": 940,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "server_tool_use": {
+      "web_search_requests": 3
+    }
+  }
+}

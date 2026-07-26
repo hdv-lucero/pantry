@@ -42,6 +42,13 @@ gem "thruster", require: false
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
 gem "image_processing", "~> 1.2"
 
+# The official Anthropic SDK, which §2 names as the first choice for the LLM call
+# ("or a thin Faraday client if the SDK fights us"). It didn't fight us: the
+# server-side web search tool (§5, Option B) is a tool definition the SDK passes
+# through, and it brings typed errors and retry/timeout handling we would
+# otherwise hand-roll. No transitive weight beyond its own HTTP stack.
+gem "anthropic"
+
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
@@ -65,4 +72,10 @@ group :test do
   # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
   gem "capybara"
   gem "selenium-webdriver"
+
+  # §8 names WebMock by name for the three LLM fixture cases (success,
+  # malformed-JSON, timeout). It is also what keeps the suite honest: with
+  # `disable_net_connect!` on, any test that would reach the Anthropic API
+  # fails loudly instead of quietly spending money.
+  gem "webmock"
 end
