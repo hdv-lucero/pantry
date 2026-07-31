@@ -1,0 +1,31 @@
+<%# §4.3 — "The modal also carries an optional, skippable thumbs prompt — 'would you
+    make this again?' — answered with a single tap and written to `recipe.make_again`,
+    the single canonical verdict for that recipe."
+
+    Second step of the same dialog rather than a second dialog: the deduction is done
+    and saved by the time this renders, so closing here costs nothing. That is what
+    "optional, skippable" has to mean — Skip is a plain button that closes the dialog
+    without a request, because leaving a verdict untouched is best done by not
+    sending one. %>
+<dialog data-controller="dialog" data-action="close->dialog#clear"
+        class="m-auto w-11/12 max-w-md rounded-xl p-5 shadow-xl backdrop:bg-gray-900/40">
+  <h2 class="text-lg font-semibold text-gray-900">Noted — <%= recipe_suggestion.title %></h2>
+  <p class="mt-1 text-sm text-gray-500">Your pantry is updated. Would you make it again?</p>
+
+  <div class="mt-5 flex items-center justify-end gap-2">
+    <button type="button" data-action="dialog#close"
+            class="rounded-md px-3 py-1.5 text-sm text-gray-500 hover:bg-gray-100 cursor-pointer">Skip</button>
+
+    <%# Thumbs down: "the recipe joins the do-not-suggest list" and its card leaves the
+        active view. Thumbs up marks it a favorite and badges every run it appears in. %>
+    <%= button_to "👎 No", recipe_verdict_path(recipe_suggestion.recipe), method: :patch,
+          params: { make_again: false },
+          form_class: "inline",
+          class: "rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 cursor-pointer" %>
+
+    <%= button_to "👍 Yes", recipe_verdict_path(recipe_suggestion.recipe), method: :patch,
+          params: { make_again: true },
+          form_class: "inline",
+          class: "rounded-md bg-amber-500 px-3 py-1.5 text-sm font-medium text-white hover:bg-amber-400 cursor-pointer" %>
+  </div>
+</dialog>

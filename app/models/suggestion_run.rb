@@ -31,6 +31,17 @@ class SuggestionRun < ApplicationRecord
   # interval between the model finishing and the user seeing it.
   after_update_commit :broadcast_card, if: :saved_change_to_status?
 
+  # §5 — an archived run "disappear[s] from the main view into a browsable history",
+  # and §4.3 wants that to happen on its own: the coverage check runs from a pantry
+  # write, so nothing is rendering a view at the time and only a broadcast can take
+  # the card off the screen. Unlike the refresh broadcasts the inventory uses, a
+  # `remove` is not filtered by request id — which is what makes it reach the tab
+  # that just confirmed a cook, not only the other one.
+  #
+  # A separate callback from `broadcast_card` rather than a branch inside it:
+  # Rails deduplicates commit callbacks by method name, so the two have to be two.
+  after_update_commit :broadcast_removal, if: :saved_change_to_archived_at?
+
   # §3 — JSON-in-text. The snapshot is what the model was shown, kept so a run
   # stays interpretable after the pantry moves on; nothing here reads it, and the
   # coverage check below deliberately measures against *live* inventory instead.
@@ -39,6 +50,16 @@ class SuggestionRun < ApplicationRecord
   scope :active, -> { where(archived_at: nil) }
   scope :archived, -> { where.not(archived_at: nil) }
   scope :recent, -> { order(created_at: :desc) }
+
+  # What the suggestions panel renders, with the two associations every card walks.
+  # Three controllers answer with that panel — creating a run, cooking one, and
+  # thumbing a recipe all re-render it — so the query they share is written once.
+  #
+  # `preload` rather than `includes`: this one loads as a join, and a joined run with
+  # five cards is five rows. Rendering deduplicates them, but `count` and `pluck` do
+  # not, so the scope would answer "12 active runs" to anyone who asked it that way.
+  # Separate queries are what was wanted here anyway.
+  scope :on_screen, -> { active.recent.preload(recipe_suggestions: :recipe) }
 
   # §5 cost control. Counted over runs created today rather than over API calls, so a
   # cache hit still spends from the allowance — the limit is there to bound a runaway
@@ -116,6 +137,15 @@ class SuggestionRun < ApplicationRecord
     recipe_suggestions.flat_map(&:uses_items).uniq
   end
 
+  # §4.3 — a thumbs-down "archive[s] the card out of the active view (its siblings in
+  # the run stay live)". No column and no scope: the verdict lives on the recipe, so
+  # a blocked card is one whose recipe says so, and history is these same rows
+  # rendered without the filter. Rejected in Ruby rather than joined in SQL so the
+  # `on_screen` preload is used as loaded instead of being thrown away.
+  def visible_suggestions
+    recipe_suggestions.reject(&:blocked?)
+  end
+
   def stale?(in_stock_names = PantryItem.in_stock_names)
     coverage(in_stock_names) < COVERAGE_THRESHOLD
   end
@@ -143,5 +173,9 @@ class SuggestionRun < ApplicationRecord
         target: self,
         partial: "suggestion_runs/suggestion_run",
         locals: { suggestion_run: self }
+    end
+
+    def broadcast_removal
+      broadcast_remove_to BROADCAST_STREAM, target: self
     end
 end

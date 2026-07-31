@@ -1,0 +1,12 @@
+<%# The list a new run's card is prepended into and every re-render replaces. The
+    empty state is a sibling rather than an `if`, so a Turbo Stream that prepends a
+    card hides it without anything having to say so — the same `only:` trick the
+    location groups use (§4.1). %>
+<div id="<%= suggestion_runs_list_id %>" class="mt-5 space-y-4">
+  <p class="hidden only:block rounded-xl border border-dashed border-gray-300 px-4 py-8 text-center text-sm text-gray-500">
+    No suggestions yet. Ask for some and we'll go looking through what's actually published.
+  </p>
+
+  <%= render partial: "suggestion_runs/suggestion_run", collection: suggestion_runs, as: :suggestion_run,
+        locals: { history: local_assigns.fetch(:history, false) } %>
+</div>

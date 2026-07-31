@@ -9,7 +9,7 @@
   <div class="grid grid-cols-2 gap-2 text-sm">
     <%= form.text_field :name, "aria-label": "Name", autofocus: true,
           class: "col-span-2 rounded-md border border-gray-300 px-2 py-1 shadow-sm" %>
-    <%= form.number_field :quantity, value: formatted_quantity(pantry_item), step: :any, min: 0, "aria-label": "Quantity",
+    <%= form.number_field :quantity, value: formatted_quantity(pantry_item.quantity), step: :any, min: 0, "aria-label": "Quantity",
           class: "rounded-md border border-gray-300 px-2 py-1 shadow-sm" %>
     <%= form.text_field :unit, list: "unit_suggestions", placeholder: "unit", "aria-label": "Unit",
           class: "rounded-md border border-gray-300 px-2 py-1 shadow-sm" %>

@@ -106,10 +106,24 @@ module AnthropicTestHelper
   # worse than unavailable — `EncryptedConfiguration#method_missing` answered it with
   # `config[:stub]`, so the block never ran and the test passed having done nothing.
   # Swapping a real singleton method cannot fail that way.
-  def without_anthropic_credentials
+  def without_anthropic_credentials(&block)
+    with_credentials_api_key(nil, &block)
+  end
+
+  # The mirror, for tests that drive SuggestRecipesJob rather than a client they
+  # constructed themselves. The job builds its own `RecipeSearch::Client`, so the only
+  # seam is this one, and without it such a test quietly depends on whoever runs it
+  # holding `config/master.key` — true on this machine, false in CI, where
+  # RAILS_MASTER_KEY is not set and credentials decrypt to nothing. The request is
+  # stubbed either way; this only stops the call being refused before WebMock sees it.
+  def with_anthropic_credentials(&block)
+    with_credentials_api_key(TEST_API_KEY, &block)
+  end
+
+  def with_credentials_api_key(value)
     singleton = RecipeSearch::Client.singleton_class
     singleton.alias_method(:__credentials_api_key, :credentials_api_key)
-    RecipeSearch::Client.define_singleton_method(:credentials_api_key) { nil }
+    RecipeSearch::Client.define_singleton_method(:credentials_api_key) { value }
 
     yield
   ensure

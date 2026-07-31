@@ -1,0 +1,23 @@
+<%# §4.2 — the suggestions panel: one cable subscription for the whole view, the
+    request form, and the active run cards.
+
+    It lives on the inventory screen rather than a page of its own because §4.3's
+    cascade is the thing worth showing: confirming a cook has to visibly move
+    quantities in the frames above and take a newly stale run off the list below,
+    from one click and without a reload. Two screens would hide half of that. %>
+<section id="suggestions" class="mt-12">
+  <%= turbo_stream_from SuggestionRun::BROADCAST_STREAM %>
+
+  <header class="flex flex-wrap items-baseline justify-between gap-3">
+    <h2 class="text-2xl font-bold">Recipe suggestions</h2>
+    <%= link_to "History", suggestion_runs_path, class: "text-sm text-gray-500 hover:underline" %>
+  </header>
+
+  <%# §1's constraint, said out loud where the user can see it. %>
+  <p class="mt-1 text-sm text-gray-500">
+    Real, published recipes that lean on what you already have — we summarise and link, never rewrite.
+  </p>
+
+  <%= render "suggestion_runs/new_run" %>
+  <%= render "suggestion_runs/runs", suggestion_runs: suggestion_runs %>
+</section>

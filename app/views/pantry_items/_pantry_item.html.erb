@@ -8,7 +8,7 @@
     <button type="button" aria-label="Decrease <%= pantry_item.name %>" data-action="quantity#decrement"
             class="size-6 rounded border border-gray-300 text-gray-600 leading-none hover:bg-gray-100 cursor-pointer">&minus;</button>
 
-    <%= form.number_field :quantity, value: formatted_quantity(pantry_item), step: :any, min: 0,
+    <%= form.number_field :quantity, value: formatted_quantity(pantry_item.quantity), step: :any, min: 0,
           "aria-label": "Quantity of #{pantry_item.name}",
           data: { quantity_target: "input", action: "change->quantity#save" },
           class: "w-14 rounded border border-gray-300 px-1 py-0.5 text-center text-sm" %>

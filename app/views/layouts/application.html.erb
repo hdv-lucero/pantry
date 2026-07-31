@@ -32,5 +32,11 @@
     <main class="container mx-auto mt-12 px-5 flex">
       <%= yield %>
     </main>
+
+    <%# §4.3's modal frame. One per page, targeted by every "I made this" link, and
+        empty until one is clicked. A frame request renders through turbo-rails' own
+        minimal layout rather than this one, so the modal's response carries exactly
+        one frame with this id and there is nothing to collide with. %>
+    <%= turbo_frame_tag modal_frame_id %>
   </body>
 </html>

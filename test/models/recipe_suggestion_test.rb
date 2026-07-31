@@ -71,4 +71,20 @@ class RecipeSuggestionTest < ActiveSupport::TestCase
     assert_equal recipe_suggestions(:beef_night_gyudon).recipe, recipe_suggestions(:history_gyudon).recipe
     assert_not_equal recipe_suggestions(:beef_night_gyudon).title, recipe_suggestions(:history_gyudon).title
   end
+
+  # §4.3 — the card the active view hides is the one whose *recipe* was thumbed down.
+  test "blocked follows the recipe's verdict" do
+    assert_predicate recipe_suggestions(:history_tuna_casserole), :blocked?
+    assert_not_predicate recipe_suggestions(:beef_night_shakshuka), :blocked?
+    assert_not_predicate recipe_suggestions(:beef_night_gyudon), :blocked?   # no verdict is not a no
+  end
+
+  # §5 — "renders as a muted hint attached to the missing item".
+  test "a substitution is found by the missing item it belongs to" do
+    suggestion = recipe_suggestions(:beef_night_gyudon)
+
+    assert_equal "olive oil", suggestion.substitution_for("sesame oil")
+    assert_nil suggestion.substitution_for("mirin")
+    assert_nil recipe_suggestions(:beef_night_shakshuka).substitution_for("paprika")
+  end
 end

@@ -25,28 +25,28 @@
 
 ### Created
 
-| File | What it holds |
-| --- | --- |
-| `app/models/inventory_snapshot.rb` | Value object over the JSON in `suggestion_runs.inventory_snapshot`: entry building, the `names` vocabulary, the cache `fingerprint` (83 lines) |
-| `app/models/recipe_search.rb` | Orchestrator — prompt → call → parse, with §5's single corrective retry (53 lines) |
-| `app/models/recipe_search/prompt.rb` | The system prompt and per-request user message; preference lists; the correction message (196 lines) |
-| `app/models/recipe_search/client.rb` | The Anthropic call: streaming, web search tool, `pause_turn` continuation, cost dials, error funnel (171 lines) |
-| `app/models/recipe_search/parser.rb` | Every §5 parse rule: fences, defensive JSON, exact-name validation, URL sanity, substitutions, blocklist, dedup, ranking (260 lines) |
-| `app/jobs/suggest_recipes_job.rb` | §4.2's lifecycle, the fingerprint cache, timeout, failure messages (103 lines) |
-| `app/views/suggestion_runs/_suggestion_run.html.erb` | Minimal four-state card — exists so `broadcast_replace_to` has something to render (41 lines) |
-| `lib/tasks/suggestions.rake` | `suggestions:capture_fixture` — one real call, written to the success fixture (42 lines) |
-| `test/test_helpers/anthropic_test_helper.rb` | Fixture loading, SSE rendering, WebMock stubs, `without_anthropic_credentials` |
-| `test/fixtures/files/anthropic/README.md` | Fixture provenance — what is hand-written, what the live call corrected |
-| `test/fixtures/files/anthropic/web_search_success.json` | 5 valid recipes, `end_turn` |
-| `test/fixtures/files/anthropic/web_search_malformed.json` | JSON that stops mid-string |
-| `test/fixtures/files/anthropic/web_search_dirty.json` | 7 recipes, every §5 filter violated at least once, fenced |
-| `test/fixtures/files/anthropic/web_search_pause_turn.json` | `pause_turn`, no text block |
-| `test/models/inventory_snapshot_test.rb` | 13 tests |
-| `test/models/recipe_search_test.rb` | 8 tests — retry orchestration |
-| `test/models/recipe_search/prompt_test.rb` | 21 tests |
-| `test/models/recipe_search/client_test.rb` | 21 tests |
-| `test/models/recipe_search/parser_test.rb` | 31 tests |
-| `test/jobs/suggest_recipes_job_test.rb` | 24 tests |
+| File                                                       | What it holds                                                                                                                                  |
+| ------------------------------------------------------------| ------------------------------------------------------------------------------------------------------------------------------------------------|
+| `app/models/inventory_snapshot.rb`                         | Value object over the JSON in `suggestion_runs.inventory_snapshot`: entry building, the `names` vocabulary, the cache `fingerprint` (83 lines) |
+| `app/models/recipe_search.rb`                              | Orchestrator — prompt → call → parse, with §5's single corrective retry (53 lines)                                                             |
+| `app/models/recipe_search/prompt.rb`                       | The system prompt and per-request user message; preference lists; the correction message (196 lines)                                           |
+| `app/models/recipe_search/client.rb`                       | The Anthropic call: streaming, web search tool, `pause_turn` continuation, cost dials, error funnel (171 lines)                                |
+| `app/models/recipe_search/parser.rb`                       | Every §5 parse rule: fences, defensive JSON, exact-name validation, URL sanity, substitutions, blocklist, dedup, ranking (260 lines)           |
+| `app/jobs/suggest_recipes_job.rb`                          | §4.2's lifecycle, the fingerprint cache, timeout, failure messages (103 lines)                                                                 |
+| `app/views/suggestion_runs/_suggestion_run.html.erb`       | Minimal four-state card — exists so `broadcast_replace_to` has something to render (41 lines)                                                  |
+| `lib/tasks/suggestions.rake`                               | `suggestions:capture_fixture` — one real call, written to the success fixture (42 lines)                                                       |
+| `test/test_helpers/anthropic_test_helper.rb`               | Fixture loading, SSE rendering, WebMock stubs, `without_anthropic_credentials`                                                                 |
+| `test/fixtures/files/anthropic/README.md`                  | Fixture provenance — what is hand-written, what the live call corrected                                                                        |
+| `test/fixtures/files/anthropic/web_search_success.json`    | 5 valid recipes, `end_turn`                                                                                                                    |
+| `test/fixtures/files/anthropic/web_search_malformed.json`  | JSON that stops mid-string                                                                                                                     |
+| `test/fixtures/files/anthropic/web_search_dirty.json`      | 7 recipes, every §5 filter violated at least once, fenced                                                                                      |
+| `test/fixtures/files/anthropic/web_search_pause_turn.json` | `pause_turn`, no text block                                                                                                                    |
+| `test/models/inventory_snapshot_test.rb`                   | 13 tests                                                                                                                                       |
+| `test/models/recipe_search_test.rb`                        | 8 tests — retry orchestration                                                                                                                  |
+| `test/models/recipe_search/prompt_test.rb`                 | 21 tests                                                                                                                                       |
+| `test/models/recipe_search/client_test.rb`                 | 21 tests                                                                                                                                       |
+| `test/models/recipe_search/parser_test.rb`                 | 31 tests                                                                                                                                       |
+| `test/jobs/suggest_recipes_job_test.rb`                    | 24 tests                                                                                                                                       |
 
 ### Modified
 

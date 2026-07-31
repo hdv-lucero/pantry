@@ -1,0 +1,8 @@
+<%# The tap is the last step of the modal, so answering it closes the dialog — an
+    empty frame removes it. Then the list re-renders: a ★ appears on every run that
+    includes the recipe, or a thumbs-downed card leaves them all while its siblings
+    stay (§4.3). %>
+<%= turbo_stream.update modal_frame_id, "" %>
+
+<%= turbo_stream.replace suggestion_runs_list_id, partial: "suggestion_runs/runs",
+      locals: { suggestion_runs: @suggestion_runs } %>

@@ -3,8 +3,11 @@ class PantryItemsController < ApplicationController
 
   helper_method :expiring_soon, :units_in_use
 
+  # §4.1's inventory and §4.2's suggestions share this screen — see
+  # `suggestion_runs/_suggestions` for why they are not two.
   def index
     @grouped_items = PantryItem.grouped_by_location
+    @suggestion_runs = SuggestionRun.on_screen
   end
 
   def create

@@ -6,6 +6,23 @@ Rails.application.routes.draw do
   # group, and :new is the persistent quick-add form on the index (§4.1).
   resources :pantry_items, except: %i[ show new ]
 
+  # §4.2 — :create is "User hits Suggest recipes"; :index is the browsable history
+  # archived runs fall into (§5). Active runs render on the inventory screen, so
+  # there is no :show — a run is a card, never a page.
+  resources :suggestion_runs, only: %i[ index create ]
+
+  # §4.3 — "I made this". :new is the modal, :create applies the deductions. A
+  # singular resource because there is one cooking of a suggestion, not a list.
+  resources :recipe_suggestions, only: [] do
+    resource :cook, only: %i[ new create ]
+  end
+
+  # §4.3 — the thumbs. The verdict is singular and lives on the recipe rather than
+  # the suggestion, so a re-asked favorite updates the one row in place (§3).
+  resources :recipes, only: [] do
+    resource :verdict, only: :update
+  end
+
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", as: :rails_health_check

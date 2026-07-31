@@ -34,6 +34,17 @@ class PantryItemsControllerTest < ActionDispatch::IntegrationTest
     assert_select "datalist#unit_suggestions option[value=?]", "gallon"
   end
 
+  # §4.2's panel shares this screen with the inventory so §4.3's cascade is visible
+  # in one place. Archived runs are not on it — they are in the history (§5).
+  test "index carries the suggestions panel with the active runs and the modal frame" do
+    get root_path
+
+    assert_select "section#suggestions"
+    assert_select "div#suggestion_runs_list div##{dom_id(suggestion_runs(:beef_night))}"
+    assert_select "div##{dom_id(suggestion_runs(:history))}", false
+    assert_select "turbo-frame#modal", count: 1
+  end
+
   # (a) quick add
 
   test "quick add parses the x notation and streams the row into its group" do

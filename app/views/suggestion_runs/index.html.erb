@@ -1,0 +1,18 @@
+<%# §5 — "Archived runs disappear from the main view into a browsable history." Read
+    only, and complete: every run there has ever been, and every card in them
+    including the ones a thumbs-down took off the active view (§4.3). %>
+<div class="w-full">
+  <header class="mb-8 flex flex-wrap items-baseline justify-between gap-4">
+    <div>
+      <h1 class="font-bold text-4xl">Suggestion history</h1>
+      <p class="mt-1 text-sm text-gray-500">
+        Every run we've made for you. Runs archive themselves when your pantry moves
+        on from them — they're kept, not deleted.
+      </p>
+    </div>
+
+    <%= link_to "Back to pantry", root_path, class: "text-sm text-gray-500 hover:underline" %>
+  </header>
+
+  <%= render "suggestion_runs/runs", suggestion_runs: @suggestion_runs, history: true %>
+</div>

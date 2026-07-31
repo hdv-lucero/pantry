@@ -1,0 +1,24 @@
+<%# §4.3 — "one click, three coordinated morphing updates". Two of the three are
+    here; the third arrives on its own. What each is and why:
+
+    * The modal advances to the thumbs step (`update`, not `replace`, so the frame
+      the layout owns stays put and only its contents change).
+    * The deducted rows repaint. Their own refresh broadcasts are filtered out by
+      request id for the tab that did the cooking (§4.1), so the acting tab gets
+      them here — the same split `create.turbo_stream.erb` makes for a quick add.
+    * The runs list is re-rendered, which is how the cooked card picks up its "you
+      made this" line. Runs the deductions made stale are already gone from it:
+      `archive_stale!` ran in the pantry's commit callbacks before this rendered,
+      and its `remove` broadcast reaches this tab too. Re-rendering the list rather
+      than the one card is what makes the two orderings agree — a late `remove`
+      lands on an id this list no longer contains. %>
+<%= turbo_stream.update modal_frame_id, partial: "cooks/verdict",
+      locals: { recipe_suggestion: @recipe_suggestion } %>
+
+<% @cook.deducted_items.each do |pantry_item| %>
+  <%= turbo_stream.replace pantry_item, partial: "pantry_items/pantry_item",
+        locals: { pantry_item: pantry_item } %>
+<% end %>
+
+<%= turbo_stream.replace suggestion_runs_list_id, partial: "suggestion_runs/runs",
+      locals: { suggestion_runs: @suggestion_runs } %>

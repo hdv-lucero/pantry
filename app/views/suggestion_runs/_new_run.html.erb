@@ -1,0 +1,20 @@
+<%# §4.2 step 1 — "User hits 'Suggest recipes', optionally typing a note ('30 minutes
+    max, no dairy')". The note is not a column on anything the form builds, so it is
+    named by hand, the same way quick-add's parsed text field is (§4.1). %>
+<div id="<%= new_suggestion_run_id %>" class="mt-4">
+  <%= form_with url: suggestion_runs_path, method: :post, class: "flex flex-wrap gap-2" do |form| %>
+    <%= label_tag "suggestion_run_prompt_notes", "Anything to work around?", class: "sr-only" %>
+    <%= text_field_tag "suggestion_run[prompt_notes]", local_assigns[:prompt_notes],
+          id: "suggestion_run_prompt_notes",
+          placeholder: "30 minutes max, no dairy (optional)",
+          autocomplete: "off",
+          class: "min-w-0 flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-blue-600" %>
+
+    <%= form.submit "Suggest recipes",
+          class: "shrink-0 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-500 cursor-pointer" %>
+  <% end %>
+
+  <% if local_assigns[:error].present? %>
+    <p role="alert" class="mt-2 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700"><%= local_assigns[:error] %></p>
+  <% end %>
+</div>

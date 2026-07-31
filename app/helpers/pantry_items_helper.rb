@@ -19,9 +19,11 @@ module PantryItemsHelper
   end
 
   # Quantities are decimal(8,2), so a plain 3 arrives as 3.0. Show what the user
-  # typed, not what the column stores.
-  def formatted_quantity(pantry_item)
-    number_with_precision(pantry_item.quantity, precision: 2, strip_insignificant_zeros: true)
+  # typed, not what the column stores. Takes the number rather than the item because
+  # the cooking modal (§4.3) formats a proposed deduction, which is a quantity
+  # without a row of its own.
+  def formatted_quantity(quantity)
+    number_with_precision(quantity, precision: 2, strip_insignificant_zeros: true)
   end
 
   def expiry_label(pantry_item)

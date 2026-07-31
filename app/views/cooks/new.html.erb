@@ -1,0 +1,59 @@
+<%# §4.3 — "Clicking it opens a modal (a Turbo Frame rendering into a dialog) that
+    lists the recipe's `uses_items` with the quantities currently on hand, pre-filled
+    with a proposed deduction for each; the user adjusts the amounts (the recipe may
+    not have used all 3 stalks) or unchecks items entirely, then confirms."
+
+    A real <dialog>, so focus trapping, the backdrop and Esc are the platform's job
+    and the Stimulus controller stays a sprinkle (§4.1's division of labour). %>
+<%= turbo_frame_tag modal_frame_id do %>
+  <dialog data-controller="dialog" data-action="close->dialog#clear"
+          class="m-auto w-11/12 max-w-md rounded-xl p-5 shadow-xl backdrop:bg-gray-900/40">
+    <h2 class="text-lg font-semibold text-gray-900">You made <%= @recipe_suggestion.title %></h2>
+    <p class="mt-1 text-sm text-gray-500">
+      Here's what it used. Adjust anything you didn't finish, or uncheck it to leave the amount alone.
+    </p>
+
+    <%= form_with url: recipe_suggestion_cook_path(@recipe_suggestion), method: :post, class: "mt-4" do |form| %>
+      <% if @cook.lines.any? %>
+        <ul class="space-y-2">
+          <% @cook.lines.each do |line| %>
+            <% item = line.pantry_item %>
+            <li class="flex items-center gap-2">
+              <%= check_box_tag "deductions[#{item.id}][apply]", "1", line.apply?,
+                    "aria-label": "Use #{item.name}",
+                    class: "size-4 shrink-0 rounded border-gray-300" %>
+
+              <span class="min-w-0 flex-1 truncate text-sm text-gray-900">
+                <%= item.name %>
+                <span class="text-gray-400">· <%= formatted_quantity(item.quantity) %><%= " #{item.unit}" if item.unit %> on hand</span>
+              </span>
+
+              <%= number_field_tag "deductions[#{item.id}][amount]", formatted_quantity(line.amount),
+                    step: :any, min: 0, max: item.quantity,
+                    "aria-label": "Amount of #{item.name} used",
+                    class: "w-20 shrink-0 rounded border border-gray-300 px-1 py-0.5 text-center text-sm" %>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <p class="text-sm text-gray-500">Nothing this recipe uses is in your pantry any more — we'll just note that you made it.</p>
+      <% end %>
+
+      <%# The echo rule (§5) means every name here came verbatim from a snapshot, so a
+          name with nothing to deduct is an item that has since left the pantry. Saying
+          so beats quietly showing a shorter list than the card promised. %>
+      <% if @cook.unavailable_names.any? %>
+        <p class="mt-3 text-xs text-gray-400">
+          Not in your pantry any more: <%= @cook.unavailable_names.to_sentence %>
+        </p>
+      <% end %>
+
+      <div class="mt-5 flex items-center justify-end gap-2">
+        <button type="button" data-action="dialog#close"
+                class="rounded-md px-3 py-1.5 text-sm text-gray-500 hover:bg-gray-100 cursor-pointer">Cancel</button>
+        <%= form.submit "I made this",
+              class: "rounded-md bg-blue-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-blue-500 cursor-pointer" %>
+      </div>
+    <% end %>
+  </dialog>
+<% end %>

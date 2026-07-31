@@ -277,8 +277,12 @@ class SuggestRecipesJobTest < ActiveSupport::TestCase
   end
 
   private
+    # Every call is stubbed, but the client still refuses to make one without a key,
+    # and the key comes from credentials nobody can decrypt in CI. Forced here so
+    # these tests measure the job rather than the runner's `config/master.key`; the
+    # "not configured yet" tests opt back out with `without_anthropic_credentials`.
     def perform
-      SuggestRecipesJob.perform_now(@run)
+      with_anthropic_credentials { SuggestRecipesJob.perform_now(@run) }
     end
 
     # Rails.cache is :null_store in test, which would make every cache assertion

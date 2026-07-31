@@ -18,4 +18,16 @@ class RecipeSuggestion < ApplicationRecord
   def cooked?
     cooked_at.present?
   end
+
+  def blocked?
+    recipe.blocked?
+  end
+
+  # §5 — "renders as a muted hint attached to the missing item". The card walks
+  # `missing_items` and asks each one whether the model proposed something on hand,
+  # so the pairing lives here rather than in the view. Parsing already guarantees
+  # `missing` is spelled the way `missing_items` spells it.
+  def substitution_for(missing_item)
+    substitutions.find { |substitution| substitution["missing"] == missing_item }&.dig("use_instead")
+  end
 end

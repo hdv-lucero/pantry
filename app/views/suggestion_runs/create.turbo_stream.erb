@@ -1,0 +1,8 @@
+<%# §4.2 step 1 — "responds with a Turbo Stream that renders the run's card in a
+    `pending` state with a spinner." Prepended, so the newest run is the one at the
+    top of the list. The job's own transitions arrive on the cable from here on. %>
+<%= turbo_stream.prepend suggestion_runs_list_id, partial: "suggestion_runs/suggestion_run",
+      locals: { suggestion_run: @suggestion_run } %>
+
+<%# Resets the note field, the same way a quick add resets its own (§4.1). %>
+<%= turbo_stream.replace new_suggestion_run_id, partial: "suggestion_runs/new_run" %>

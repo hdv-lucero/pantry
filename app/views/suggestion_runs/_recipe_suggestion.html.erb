@@ -1,0 +1,72 @@
+<%# §4.2 step 3 — "each showing title, summary, which of *your* items it uses, what's
+    missing, and a link to the real source recipe."
+
+    §1 and §5's content boundary decide what is *not* here: no instructions, no
+    ingredient list from the page. Our own summary, the overlap, and the link. %>
+<% history = local_assigns.fetch(:history, false) %>
+
+<%= tag.div id: dom_id(recipe_suggestion), class: "rounded-lg border border-gray-100 bg-gray-50 p-3" do %>
+  <div class="flex items-baseline justify-between gap-2">
+    <h4 class="text-sm font-semibold text-gray-900">
+      <%= link_to recipe_suggestion.title, recipe_suggestion.recipe.source_url,
+            class: "hover:underline", target: "_blank", rel: "noopener noreferrer" %>
+    </h4>
+
+    <% if recipe_suggestion.recipe.favorite? %>
+      <span class="shrink-0 text-amber-500" title="One of your favorites">★</span>
+    <% elsif history && recipe_suggestion.blocked? %>
+      <span class="shrink-0 rounded-full bg-gray-200 px-2 py-0.5 text-xs text-gray-600">Not for you</span>
+    <% end %>
+  </div>
+
+  <%# §5 — "each card stores `source_name` and our own summary, so an archived card
+      remains meaningful ('Gyudon — Just One Cookbook') even if its link eventually
+      dies." That is why the source is named in text and not only linked. %>
+  <% if recipe_suggestion.recipe.source_name.present? %>
+    <p class="text-xs text-gray-500"><%= recipe_suggestion.recipe.source_name %></p>
+  <% end %>
+
+  <% if recipe_suggestion.summary.present? %>
+    <p class="mt-1 text-sm text-gray-700"><%= recipe_suggestion.summary %></p>
+  <% end %>
+
+  <% if recipe_suggestion.uses_items.any? %>
+    <p class="mt-2 flex flex-wrap items-center gap-1 text-xs">
+      <span class="text-gray-500">Uses</span>
+      <% recipe_suggestion.uses_items.each do |name| %>
+        <span class="rounded-full bg-green-100 px-2 py-0.5 text-green-800"><%= name %></span>
+      <% end %>
+    </p>
+  <% end %>
+
+  <%# §5's missing-items UX — "each card displays its missing list prominently ('you'd
+      need: bok choi')" — with the substitution as "a muted hint attached to the
+      missing item", which is where the doc puts it and why it is not its own list. %>
+  <% if recipe_suggestion.missing_items.any? %>
+    <p class="mt-1 flex flex-wrap items-center gap-1 text-xs">
+      <span class="text-gray-500">You'd need</span>
+      <% recipe_suggestion.missing_items.each do |name| %>
+        <span class="rounded-full bg-white px-2 py-0.5 text-gray-700 ring-1 ring-gray-200">
+          <%= name %>
+          <% if (substitute = recipe_suggestion.substitution_for(name)) %>
+            <span class="text-gray-400">· you could try: <%= substitute %></span>
+          <% end %>
+        </span>
+      <% end %>
+    </p>
+  <% end %>
+
+  <div class="mt-3">
+    <% if recipe_suggestion.cooked? %>
+      <p class="text-xs font-medium text-green-700">
+        ✓ You made this <%= time_ago_in_words(recipe_suggestion.cooked_at) %> ago
+      </p>
+    <% elsif !history %>
+      <%# §4.3 — the modal is a Turbo Frame rendering into a dialog, and every card on
+          the page aims at the one frame the layout holds. %>
+      <%= link_to "I made this", new_recipe_suggestion_cook_path(recipe_suggestion),
+            data: { turbo_frame: modal_frame_id },
+            class: "inline-block rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-100" %>
+    <% end %>
+  </div>
+<% end %>

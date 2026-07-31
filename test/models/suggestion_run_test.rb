@@ -215,14 +215,37 @@ class SuggestionRunTest < ActiveSupport::TestCase
     end
   end
 
-  test "a write that does not change status does not broadcast" do
+  test "a write that changes neither status nor archived_at does not broadcast" do
     run = SuggestionRun.create!
     run.start!(InventorySnapshot.current)
 
     assert_turbo_stream_broadcasts SuggestionRun::BROADCAST_STREAM, count: 0 do
       run.update!(prompt_notes: "something quick")
+    end
+  end
+
+  # §4.3's cascade ends here: the pantry write archives the run, and only a broadcast
+  # can take its card off a screen nobody is re-rendering.
+  test "archiving broadcasts a removal, and only the first one does" do
+    run = suggestion_runs(:beef_night)
+
+    assert_turbo_stream_broadcasts SuggestionRun::BROADCAST_STREAM, count: 1 do
+      run.archive!
       run.archive!
     end
+  end
+
+  test "the removal broadcast targets the run's own card" do
+    run = suggestion_runs(:beef_night)
+
+    run.archive!
+
+    # The pubsub adapter stores the encoded payload, so the markup comes back out
+    # of the JSON it was wrapped in.
+    stream = JSON.parse(ActionCable.server.pubsub.broadcasts(SuggestionRun::BROADCAST_STREAM).last)
+
+    assert_includes stream, %(action="remove")
+    assert_includes stream, %(target="#{ActionView::RecordIdentifier.dom_id(run)}")
   end
 
   # ── §5's per-day limit ──────────────────────────────────────────────────────
@@ -280,6 +303,35 @@ class SuggestionRunTest < ActiveSupport::TestCase
     run.recipe_suggestions.create!(recipe: recipes(:shakshuka), title: "Shakshuka", uses_items: [])
 
     assert_predicate run.reload, :includes_favorite?
+  end
+
+  # The panel's own query. Counted rather than just listed because the preload it
+  # carries would answer this question with one row per card if it joined.
+  test "on_screen is the active runs, newest first, one row each" do
+    assert_equal SuggestionRun.active.count, SuggestionRun.on_screen.count
+    assert_equal SuggestionRun.active.order(created_at: :desc).to_a, SuggestionRun.on_screen.to_a
+    assert_not_includes SuggestionRun.on_screen, suggestion_runs(:history)
+  end
+
+  # §4.3 — a thumbs-down takes one card out of the active view without touching the
+  # run or its siblings.
+  test "visible_suggestions drops the blocked cards and keeps the rest" do
+    run = suggestion_runs(:beef_night)
+
+    assert_equal run.recipe_suggestions.to_a, run.visible_suggestions
+
+    recipes(:gyudon).update!(make_again: false)
+
+    assert_equal [ recipe_suggestions(:beef_night_shakshuka) ], run.reload.visible_suggestions
+    assert_not_predicate run, :archived?
+  end
+
+  # The run still leans on what a hidden card uses, so hiding one must not quietly
+  # move the coverage score that decides when the whole run is archived (§5).
+  test "a blocked card still counts toward coverage" do
+    recipes(:gyudon).update!(make_again: false)
+
+    assert_includes suggestion_runs(:beef_night).used_item_names, "ground beef"
   end
 
   private
